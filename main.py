@@ -42,7 +42,6 @@ class RedditHelper:
         return comments_stream
 
 class Dumper:
-
     submissionsFile = "/usr/local/share/filtered-submissions.csv"
     commentsFile = "/usr/local/share/filtered-comments.csv"
 
@@ -60,7 +59,6 @@ class Dumper:
 
 
 class Aggregator:
-
     def __init__(self, redditHelper):
         self.redditHelper = redditHelper
         self.submissions = []
@@ -120,7 +118,6 @@ class Aggregator:
                 comment_stream = self.commentStream(subreddits)
 
 class BaseFilter:
-
     def __init__(self):
         self.keywords = ["hbinvhuds", "funky-new-keyword"]
 
@@ -147,7 +144,6 @@ class PostMan:
         pass
 
 class Filters(BaseFilter):
-
     def __init__(self):
         BaseFilter.__init__(self)
 
