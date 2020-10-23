@@ -1,0 +1,7 @@
+keywords:
+  - holy
+  - cow
+response: response to matched keywords
+credsPath: /Users/shobhits/Documents/shobhit/repos/self/redditer/creds.yml
+submissionsFile: /usr/local/share/filtered-submissions.csv
+commentsFile: /usr/local/share/filtered-comments.csv

@@ -1,17 +1,13 @@
 #! usr/bin/env python3
 
-# https://www.storybench.org/how-to-scrape-reddit-with-python/
-# https://github.com/bag-man/newpost
-# https://praw.readthedocs.io/en/v6.1.1/code_overview/models/multireddit.html?highlight=multi#praw.models.Multireddit.stream
-
 import praw
-import pandas as pd
-import datetime as dt
 import time
 import sys
-import logging
 import threading
 import csv
+import os
+import yaml
+import logging
 
 class RedditHelper:
     def __init__(self, client_id, client_secret, app_name, username, password):
@@ -42,28 +38,29 @@ class RedditHelper:
         return comments_stream
 
 class Dumper:
-    submissionsFile = "/usr/local/share/filtered-submissions.csv"
-    commentsFile = "/usr/local/share/filtered-comments.csv"
+    def __init__(self, config):
+        self.submissionsFile = config["submissionsFile"]
+        self.commentsFile = config["commentsFile"]
 
-    @classmethod
-    def dumpSubmission(cls, row):
-        with open(cls.submissionsFile, 'a') as outfile:
+    def dumpSubmission(self, row):
+        with open(self.submissionsFile, 'a') as outfile:
             writer = csv.writer(outfile)
             writer.writerow([row])
 
-    @classmethod
-    def dumpComment(cls, row):
-        with open(cls.commentsFile, 'a') as outfile:
+    def dumpComment(self, row):
+        with open(self.commentsFile, 'a') as outfile:
             writer = csv.writer(outfile)
             writer.writerow([row])
 
 
 class Aggregator:
-    def __init__(self, redditHelper):
+    def __init__(self, redditHelper, config):
         self.redditHelper = redditHelper
         self.submissions = []
         self.comments = []
-        self.filters = Filters()
+        self.filters = Filters(config)
+        self.postMan = PostMan(config.get("response"))
+        self.dumper = Dumper(config)
 
     def submissionStream(self, subreddits):
         return self.redditHelper.startPostsStream("+".join(subreddits))
@@ -82,8 +79,9 @@ class Aggregator:
                         break
                     elif first is not True and self.filters.applyToSubmission(submission):
                         self.submissions.append(submission)
-                        Dumper.dumpSubmission(submission.id)
-                time.sleep(5)
+                        self.dumper.dumpSubmission(submission.id)
+                        self.postMan.postComment(submission)
+                time.sleep(10)
                 first = False
                 print("submissions: %s" % self.submissions)
             except KeyboardInterrupt:
@@ -105,8 +103,9 @@ class Aggregator:
                         break
                     elif first is not True and self.filters.applyToComment(comment):
                         self.comments.append(comment)
-                        Dumper.dumpComment(comment.id)
-                time.sleep(5)
+                        self.dumper.dumpComment(comment.id)
+                        self.postMan.postReply(comment)
+                time.sleep(10)
                 first = False
                 print("comments: %s" % self.comments)
             except KeyboardInterrupt:
@@ -118,8 +117,8 @@ class Aggregator:
                 comment_stream = self.commentStream(subreddits)
 
 class BaseFilter:
-    def __init__(self):
-        self.keywords = ["hbinvhuds", "funky-new-keyword"]
+    def __init__(self, config):
+        self.keywords = config["keywords"]
 
     def baseCommentFilters(self, object):
         for keyword in self.keywords:
@@ -134,18 +133,26 @@ class BaseFilter:
         return object
 
 class PostMan:
-    def __init__(self):
-        pass
+    def __init__(self, response):
+        self.response = response
 
-    def postComment(self):
-        pass
+    def postComment(self, submission):
+        try:
+            if self.response:
+                submission.reply(self.response)
+        except Exception as e:
+            logging.error("Exception while adding comment to submission: " + str(e))
 
-    def postReply(self):
-        pass
+    def postReply(self, comment):
+        try:
+            if self.response:
+                comment.reply(self.response)
+        except Exception as e:
+            logging.error("Exception while adding reply to comment: " + str(e))
 
 class Filters(BaseFilter):
-    def __init__(self):
-        BaseFilter.__init__(self)
+    def __init__(self, config):
+        BaseFilter.__init__(self, config)
 
     def applyToComment(self, object):
         object = self.baseCommentFilters(object)
@@ -159,25 +166,45 @@ class Filters(BaseFilter):
         # object = SomeNewFilterClass.someNewFilter(object) if object is not None else None
         return object
 
+def resetResultFiles(submissionsFile, commentsFile):
+    try:
+        os.remove(submissionsFile)
+        os.remove(commentsFile)
+    except OSError:
+        pass
+
+def loadConfig(path):
+    with open(path) as file:
+        config = yaml.load(file, Loader=yaml.FullLoader)
+    return config
+
+def loadCreds(path):
+    with open(path) as file:
+        creds = yaml.load(file, Loader=yaml.FullLoader)
+    return creds
+
 def main():
-    # TODO: reset result files before execution
-    # TODO: take creds as argument, take response as argument
-    # TODO: take keywords as arguments
-    redditHelper = RedditHelper('client-id', 'client-secret', 'app-name', 'username', 'password')
-    aggregator = Aggregator(redditHelper)
-    postman = PostMan()
+    config = loadConfig("./config.yml")
+    creds = loadCreds(config["credsPath"])
+
+    resetResultFiles(config["submissionsFile"], config["commentsFile"])
+
+    redditHelper = RedditHelper(
+        creds['client-id'],
+        creds['client-secret'],
+        creds['app-name'],
+        creds['username'],
+        creds['password']
+    )
+    aggregator = Aggregator(redditHelper, config)
 
     threads = []
 
     submissions = threading.Thread(target=aggregator.aggregateSubmissions)
     comments = threading.Thread(target=aggregator.aggregateComments)
-    postcomment = threading.Thread(target=postman.postComment)
-    postreply = threading.Thread(target=postman.postReply)
 
     threads.append(submissions)
     threads.append(comments)
-    threads.append(postcomment)
-    threads.append(postreply)
 
     submissions.start(), comments.start()
     for index, thread in enumerate(threads):
