@@ -15,7 +15,7 @@ venv/bin/pip install -r requirements.txt
 
 ## Usage
 
-1. Create an App in reddit using the instructions mentioned here [here](https://github.com/reddit-archive/reddit/wiki/OAuth2-Quick-Start-Example#first-steps)
+1. Create an App in reddit using the instructions mentioned [here](https://github.com/reddit-archive/reddit/wiki/OAuth2-Quick-Start-Example#first-steps)
 
 2. Create a yml file storing the user credentials generated above in the following format:
     ```yaml
@@ -55,19 +55,19 @@ venv/bin/pip install -r requirements.txt
 2. Loads credentials from the `credsPath` specified in `redditer/config.yml`
 
 3. Resets result files that are specified by the following fields in `redditer/config.yml`:
-    ..1. submissionsFile
-    ..2. commentsFile
+    1. submissionsFile
+    2. commentsFile
 
 4. Creates `redditHelper` object using the configurations provided and `praw` python package.
 
 5. Initializes Aggregator object. Aggregator in turn does the following before returning the object:
-    ..1. Initialize `filters` object - The job of filters is to apply user-provided filters to all posts or comments that the aggregator aggregates.
-    ..2. Initialize `postMan` object - Postman reads the response provided by the user and applies that response to all the filtered out posts and comments.
-    ..3. Initialize `dumper` object - The job of dumper is to dump all the filtered out submissions and comments to files specified by the user in CSV format. Refer to *Results format* section to know more about results structure.
+    1. Initialize `filters` object - The job of filters is to apply user-provided filters to all posts or comments that the aggregator aggregates.
+    2. Initialize `postMan` object - Postman reads the response provided by the user and applies that response to all the filtered out posts and comments.
+    3. Initialize `dumper` object - The job of dumper is to dump all the filtered out submissions and comments to files specified by the user in CSV format. Refer to *Results format* section to know more about results structure.
     
 6. Spawn two threads:
-    ..1. One thread to stream submissions based on filters provided
-    ..2. One thread to stream comments based on filters provided
+    1. One thread to stream submissions based on filters provided
+    2. One thread to stream comments based on filters provided
     
 7. Reddit doesn't allow you to post comments more than once every 5 seconds. So to avoid being blocked by reddit, `Aggregator` polls reddit for new Posts or Comments with a sleep of 10 seconds.
 
