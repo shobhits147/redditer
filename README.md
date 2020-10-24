@@ -104,7 +104,7 @@ Since we are dumping a CSV, this can be easily loaded into analytics systems and
 
 ## Existing Filters
 
-1. In any post or comment, it extracts only those that include all of the keywords specified in `redditer/config.yml`
+1. It extracts only those posts or comments that include all of the keywords specified in `redditer/config.yml`
 
 2. Subreddits mentioned in `exclude` section of `redditer/config.yml` are ignored even if the user is subscribed to it
 
