@@ -76,12 +76,11 @@ class Aggregator:
                 comment_stream = self.commentStream(self.subreddits)
 
 def resetResultFiles(submissionsFile, commentsFile):
-    logging.info("Resetting result files: " + submissionsFile + "and" + commentsFile)
-    try:
+    logging.info("Resetting result files: " + submissionsFile + " and " + commentsFile)
+    if os.path.exists(submissionsFile):
         os.remove(submissionsFile)
+    if os.path.exists(commentsFile):
         os.remove(commentsFile)
-    except OSError:
-        pass
 
 def loadConfig(path):
     logging.info("Loadin configuration from: " + path)
