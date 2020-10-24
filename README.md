@@ -50,9 +50,50 @@ venv/bin/pip install -r requirements.txt
     
 ## How it Works
 
+1. Loads configuration from `redditer/config.yml`
+
+2. Loads credentials from the `credsPath` specified in `redditer/config.yml`
+
+3. Resets result files that are specified by the following fields in `redditer/config.yml`:
+    ..1. submissionsFile
+    ..2. commentsFile
+
+4. Creates `redditHelper` object using the configurations provided and `praw` python package.
+
+5. Initializes Aggregator object. Aggregator in turn does the following before returning the object:
+    ..1. Initialize `filters` object - The job of filters is to apply user-provided filters to all posts or comments that the aggregator aggregates.
+    ..2. Initialize `postMan` object - Postman reads the response provided by the user and applies that response to all the filtered out posts and comments.
+    ..3. Initialize `dumper` object - The job of dumper is to dump all the filtered out submissions and comments to files specified by the user in CSV format. Refer to *Results format* section to know more about results structure.
+    
+6. Spawn two threads:
+    ..1. One thread to stream submissions based on filters provided
+    ..2. One thread to stream comments based on filters provided
+    
+7. Reddit doesn't allow you to post comments more than once every 5 seconds. So to avoid being blocked by reddit, `Aggregator` polls reddit for new Posts or Comments with a sleep of 10 seconds.
+
+8. For any matching Submission, aggregator adds a comment to that post and dumps the original post's details to `submissionsFile`
+
+9. For any matching Comment, aggregator adds a reply to that comment and dumps the original comment's details to `commentsFile`
 
 ## Results format
 
+Submissions file:
+```csv
+shobhits-mbp:~ shobhits$ tail -f /usr/local/share/filtered-submissions.csv
+jh5wb9,shobhit-s,https://www.reddit.com/r/testingground4bots/comments/jh5wb9/new_post_24/
+```
+Format: `submission-id,submission-author,submission-url`
+
+
+Comments file:
+```csv
+shobhits-mbp:~ shobhits$ tail -f /usr/local/share/filtered-comments.csv
+g9vr02q,shobhit-s
+```
+Format: `comment-id,comment-author`
+
+
+Since we are dumping a CSV, this can be easily loaded into analytics systems and used in Pandas Dataframes.
 
 ## How to add custom filter logics
 
