@@ -90,6 +90,7 @@ def loadCreds(path):
     return creds
 
 def main():
+    # TODO: Add log lines here
     config = loadConfig("./config.yml")
     creds = loadCreds(config["credsPath"])
 
