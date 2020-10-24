@@ -69,11 +69,13 @@ venv/bin/pip install -r requirements.txt
     1. One thread to stream submissions based on filters provided
     2. One thread to stream comments based on filters provided
     
-7. Reddit doesn't allow you to post comments more than once every 5 seconds. So to avoid being blocked by reddit, `Aggregator` polls reddit for new Posts or Comments with a sleep of 10 seconds.
+7. Aggregator tracks only those subreddits that the configured user is subscribed to
 
-8. For any matching Submission, aggregator adds a comment to that post and dumps the original post's details to `submissionsFile`
+8. Reddit doesn't allow you to post comments more than once every 5 seconds. So to avoid being blocked by reddit, `Aggregator` polls reddit for new Posts or Comments with a sleep of 10 seconds.
 
-9. For any matching Comment, aggregator adds a reply to that comment and dumps the original comment's details to `commentsFile`
+9. For any matching Submission, aggregator adds a comment to that post and dumps the original post's details to `submissionsFile`
+
+10. For any matching Comment, aggregator adds a reply to that comment and dumps the original comment's details to `commentsFile`
 
 ## Results format
 
