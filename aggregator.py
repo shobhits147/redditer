@@ -5,14 +5,18 @@ import sys
 import threading
 import os
 import yaml
+import logging
 
 import reddit_helper
 import dumper
 import postman
 import filters
 
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+
 class Aggregator:
     def __init__(self, redditHelper, config):
+        logging.info("Initializing aggregator...")
         self.redditHelper = redditHelper
         self.submissions = []
         self.comments = []
@@ -37,7 +41,7 @@ class Aggregator:
                         break
                     elif first is not True and self.filters.applyToSubmission(submission):
                         self.submissions.append(submission)
-                        self.dumper.dumpSubmission(submission.id)
+                        self.dumper.dumpSubmission([submission.id, submission.author, submission.url])
                         self.postMan.postComment(submission)
                 time.sleep(10)
                 first = False
@@ -60,7 +64,7 @@ class Aggregator:
                         break
                     elif first is not True and self.filters.applyToComment(comment):
                         self.comments.append(comment)
-                        self.dumper.dumpComment(comment.id)
+                        self.dumper.dumpComment([comment.id, comment.author])
                         self.postMan.postReply(comment)
                 time.sleep(10)
                 first = False
@@ -73,6 +77,7 @@ class Aggregator:
                 comment_stream = self.commentStream(subreddits)
 
 def resetResultFiles(submissionsFile, commentsFile):
+    logging.info("Resetting result files: " + submissionsFile + "and" + commentsFile)
     try:
         os.remove(submissionsFile)
         os.remove(commentsFile)
@@ -80,11 +85,13 @@ def resetResultFiles(submissionsFile, commentsFile):
         pass
 
 def loadConfig(path):
+    logging.info("Loadin configuration from: " + path)
     with open(path) as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
     return config
 
 def loadCreds(path):
+    logging.info("Loading credentials from: " + path)
     with open(path) as file:
         creds = yaml.load(file, Loader=yaml.FullLoader)
     return creds
@@ -106,6 +113,7 @@ def main():
 
     threads = []
 
+    logging.info("Spawning submission and comment aggregator threads...")
     submissions = threading.Thread(target=aggregator.aggregateSubmissions)
     comments = threading.Thread(target=aggregator.aggregateComments)
 
@@ -113,6 +121,8 @@ def main():
     threads.append(comments)
 
     submissions.start(), comments.start()
+    logging.info("Threads started!!")
+    logging.info("Listening for posts and comments...")
     for index, thread in enumerate(threads):
         thread.join()
 

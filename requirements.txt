@@ -1,0 +1,5 @@
+pyyaml==5.3.1
+praw==7.1.0
+urllib3==1.25.11
+numpy==1.19.2
+pandas==1.1.3
