@@ -52,6 +52,7 @@ venv/bin/pip install -r requirements.txt
 
 
 ## How to add custom filter logics
+
 1. To add a new filter to the collected submissions and comments, you need modify `redditer/filters.py`
 
 2. Define your own class of filters, e.g.:
@@ -83,4 +84,4 @@ venv/bin/pip install -r requirements.txt
            # object = SomeNewFilterClass.someNewFilter(object) if object is not None else None
            return object
     ```
-
+4. New filters can be applied to submissions in the same manner
