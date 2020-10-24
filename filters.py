@@ -2,13 +2,13 @@ class BaseFilter:
     def __init__(self, config):
         self.keywords = config["keywords"]
 
-    def baseCommentFilters(self, object):
+    def basicCommentFilters(self, object):
         for keyword in self.keywords:
             if keyword not in object.body:
                 return None
         return object
 
-    def baseSubmissionFilters(self, object):
+    def basicSubmissionFilters(self, object):
         for keyword in self.keywords:
             if keyword not in (object.title + " " + object.selftext):
                 return None
@@ -19,13 +19,13 @@ class Filters(BaseFilter):
         BaseFilter.__init__(self, config)
 
     def applyToComment(self, object):
-        object = self.baseCommentFilters(object)
+        object = self.basicCommentFilters(object)
         # call other filters if required e.g.:
         # object = SomeNewFilterClass.someNewFilter(object) if object is not None else None
         return object
 
     def applyToSubmission(self, object):
-        object = self.baseSubmissionFilters(object)
+        object = self.basicSubmissionFilters(object)
         # call other filters if required e.g.:
         # object = SomeNewFilterClass.someNewFilter(object) if object is not None else None
         return object
