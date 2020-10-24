@@ -1,18 +1,32 @@
+import logging
+import sys
+
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+
 class BaseFilter:
     def __init__(self, config):
         self.keywords = config["keywords"]
+        self.config = config
+
+    def keywordCheck(self, body):
+        for keyword in self.keywords:
+            if keyword not in body:
+                return False
+        return True
+
+    def ignoreAuthors(self, author):
+        if author in self.config.get("exclude").get("authors"):
+            logging.info("Ignoring post/comment from author " + author)
+            return False
+        return True
 
     def basicCommentFilters(self, object):
-        for keyword in self.keywords:
-            if keyword not in object.body:
-                return None
-        return object
+        acceptable = self.keywordCheck(object.body) and self.ignoreAuthors(object.author.name)
+        return object if acceptable else None
 
     def basicSubmissionFilters(self, object):
-        for keyword in self.keywords:
-            if keyword not in (object.title + " " + object.selftext):
-                return None
-        return object
+        acceptable = self.keywordCheck(object.title + " " + object.selftext) and self.ignoreAuthors(object.author.name)
+        return object if acceptable else None
 
 class Filters(BaseFilter):
     def __init__(self, config):

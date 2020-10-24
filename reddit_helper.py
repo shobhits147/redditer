@@ -1,7 +1,11 @@
 import praw
+import logging
+import sys
+
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 class RedditHelper:
-    def __init__(self, client_id, client_secret, app_name, username, password):
+    def __init__(self, client_id, client_secret, app_name, username, password, config):
         self.reddit = praw.Reddit(
             client_id=client_id,
             client_secret=client_secret,
@@ -9,12 +13,17 @@ class RedditHelper:
             username=username,
             password=password
         )
+        self.config = config
 
     def userSubreddits(self):
         subreddits = self.reddit.user.subreddits(limit=None)
         retVal = []
+        blacklisted = self.config.get("exclude").get("subreddits")
+        if blacklisted:
+            logging.info("Ignoring blacklisted subreddits: " + str(blacklisted))
         for s in subreddits:
-            retVal.append(s.display_name)
+            if s.display_name not in blacklisted:
+                retVal.append(s.display_name)
         return retVal
 
     def printRedditObject(self):

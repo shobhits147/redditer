@@ -35,6 +35,12 @@ venv/bin/pip install -r requirements.txt
     credsPath: /Users/shobhits/Documents/redditer/creds.yml
     submissionsFile: /usr/local/share/filtered-submissions.csv
     commentsFile: /usr/local/share/filtered-comments.csv
+    exclude:
+      subreddits:
+        - valorant
+        - mario
+      authors:
+        - ElonMuskOfficial
     ```
 
 4. In `redditer/config.yml` file substitute the path of the file created in Step 2 in the field `credsPath`
@@ -46,7 +52,6 @@ venv/bin/pip install -r requirements.txt
     cd redditer/
     venv/bin/python aggregator.py
     ```
-    
     
 ## How it Works
 
@@ -69,7 +74,7 @@ venv/bin/pip install -r requirements.txt
     1. One thread to stream submissions based on filters provided
     2. One thread to stream comments based on filters provided
     
-7. Aggregator tracks only those subreddits that the configured user is subscribed to
+7. Aggregator tracks only those subreddits that the configured user is subscribed to and is not excluded in `config.yml`
 
 8. Reddit doesn't allow you to post comments more than once every 5 seconds. So to avoid being blocked by reddit, `Aggregator` polls reddit for new Posts or Comments with a sleep of 10 seconds.
 
@@ -96,6 +101,14 @@ Format: `comment-id,comment-author`
 
 
 Since we are dumping a CSV, this can be easily loaded into analytics systems and used in Pandas Dataframes.
+
+## Existing Filters
+
+1. In any post or comment, it extracts only those that include all of the keywords specified in `redditer/config.yml`
+
+2. Subreddits mentioned in `exclude` section of `redditer/config.yml` are ignored even if the user is subscribed to it
+
+3. Posts or comments made by authors mentioned in `exclude` section of `redditer/config.yml` are ignored.
 
 ## How to add custom filter logics
 
