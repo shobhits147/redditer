@@ -96,6 +96,7 @@ venv/bin/pip install -r requirements.txt
 2. Redditer will respond `Bazinga!!` to any post or comment it finds matching the filters specified.
 
 3. The following images should make it a bit clear:
+
     ![New post containing required keywords](https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true)
     
     ![Comment added by Redditer to matched posts](https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true)
