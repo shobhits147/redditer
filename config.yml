@@ -5,3 +5,10 @@ response: Bazinga!!
 credsPath: /Users/shobhits/Documents/shobhit/repos/self/redditer/creds.yml
 submissionsFile: /usr/local/share/filtered-submissions.csv
 commentsFile: /usr/local/share/filtered-comments.csv
+exclude:
+  subreddits:
+    - valorant
+    - mario
+  authors:
+    - ElonMuskOfficial
+    - shobhit-s

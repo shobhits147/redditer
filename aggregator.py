@@ -20,6 +20,7 @@ class Aggregator:
         self.redditHelper = redditHelper
         self.submissions = []
         self.comments = []
+        self.subreddits = self.redditHelper.userSubreddits()
         self.filters = filters.Filters(config)
         self.postMan = postman.PostMan(config.get("response"))
         self.dumper = dumper.Dumper(config)
@@ -31,8 +32,7 @@ class Aggregator:
         return self.redditHelper.startCommentsStream("+".join(subreddits))
 
     def aggregateSubmissions(self):
-        subreddits = self.redditHelper.userSubreddits()
-        submission_stream = self.submissionStream(subreddits)
+        submission_stream = self.submissionStream(self.subreddits)
         first = True
         while True:
             try:
@@ -51,11 +51,10 @@ class Aggregator:
             except Exception as e:
                 print('Error:', e)
                 time.sleep(30)
-                submission_stream = self.submissionStream(subreddits)
+                submission_stream = self.submissionStream(self.subreddits)
 
     def aggregateComments(self):
-        subreddits = self.redditHelper.userSubreddits()
-        comment_stream = self.commentStream(subreddits)
+        comment_stream = self.commentStream(self.subreddits)
         first = True
         while True:
             try:
@@ -74,15 +73,14 @@ class Aggregator:
             except Exception as e:
                 print('Error:', e)
                 time.sleep(30)
-                comment_stream = self.commentStream(subreddits)
+                comment_stream = self.commentStream(self.subreddits)
 
 def resetResultFiles(submissionsFile, commentsFile):
-    logging.info("Resetting result files: " + submissionsFile + "and" + commentsFile)
-    try:
+    logging.info("Resetting result files: " + submissionsFile + " and " + commentsFile)
+    if os.path.exists(submissionsFile):
         os.remove(submissionsFile)
+    if os.path.exists(commentsFile):
         os.remove(commentsFile)
-    except OSError:
-        pass
 
 def loadConfig(path):
     logging.info("Loadin configuration from: " + path)
@@ -107,7 +105,8 @@ def main():
         creds['client-secret'],
         creds['app-name'],
         creds['username'],
-        creds['password']
+        creds['password'],
+        config
     )
     aggregator = Aggregator(redditHelper, config)
 
