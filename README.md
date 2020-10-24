@@ -76,7 +76,7 @@ venv/bin/pip install -r requirements.txt
            BaseFilter.__init__(self, config)
            self.complexLogic = ComplexLogic()
     
-       def applyToComment(self, object):
+        def applyToComment(self, object):
            object = self.basicCommentFilters(object)
            if object:
                object = self.complexLogic.applyToComment(object)
