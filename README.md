@@ -65,22 +65,28 @@ venv/bin/pip install -r requirements.txt
 
 4. Creates `redditHelper` object using the configurations provided and `praw` python package.
 
-5. Initializes Aggregator object. Aggregator in turn does the following before returning the object:
+5. Initializes Aggregator object. Aggregator initializes the following before returning the object:
     1. Initialize `filters` object - The job of filters is to apply user-provided filters to all posts or comments that the aggregator aggregates.
     2. Initialize `postMan` object - Postman reads the response provided by the user and applies that response to all the filtered out posts and comments.
     3. Initialize `dumper` object - The job of dumper is to dump all the filtered out submissions and comments to files specified by the user in CSV format. Refer to *Results format* section to know more about results structure.
     
-6. Spawn two threads:
+6. The job of Aggregator is to:
+    1. Stream posts and comments at 10 seconds interval
+    2. Filter out data that doesn't match the base and provided filters
+    3. Add the given response to matched posts and comments
+    4. Dump data about the filtered posts and comments to `submissionsFile` and `commentsFile`
+
+7. Spawn two threads:
     1. One thread to stream submissions based on filters provided
     2. One thread to stream comments based on filters provided
     
-7. Aggregator tracks only those subreddits that the configured user is subscribed to and is not excluded in `config.yml`
+8. Aggregator tracks only those subreddits that the configured user is subscribed to and is not excluded in `config.yml`
 
-8. Reddit doesn't allow you to post comments more than once every 5 seconds. So to avoid being blocked by reddit, `Aggregator` polls reddit for new Posts or Comments with a sleep of 10 seconds.
+9. Reddit doesn't allow you to post comments more than once every 5 seconds. So to avoid being blocked by reddit, `Aggregator` polls reddit for new Posts or Comments with a sleep of 10 seconds.
 
-9. For any matching Submission, aggregator adds a comment to that post and dumps the original post's details to `submissionsFile`
+10. For any matching Submission, aggregator adds a comment to that post and dumps the original post's details to `submissionsFile`
 
-10. For any matching Comment, aggregator adds a reply to that comment and dumps the original comment's details to `commentsFile`
+11. For any matching Comment, aggregator adds a reply to that comment and dumps the original comment's details to `commentsFile`
 
 ## Results format
 
