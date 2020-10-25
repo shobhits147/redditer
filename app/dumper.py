@@ -3,6 +3,11 @@ import logging
 import sys
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
+
+'''
+The job of dumper is to dump rows of filtered data sent to it by aggregator
+to submissionsFile and commentsFile
+'''
 class Dumper:
     def __init__(self, config):
         self.submissionsFile = config["submissionsFile"]

@@ -7,13 +7,21 @@ import os
 import yaml
 import logging
 
-import reddit_helper
-import dumper
 import postman
 import filters
+import reddit_helper
+import dumper
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
+
+'''
+The job of Aggregator is to:
+1. Stream posts and comments at 10 seconds interval
+2. Filter out data that doesn't match the base filters and custom filters
+3. Add the given response to matched posts and comments
+4. Dump data about the filtered posts and comments to `submissionsFile` and `commentsFile`
+'''
 class Aggregator:
     def __init__(self, redditHelper, config):
         logging.info("Initializing aggregator...")
@@ -83,7 +91,7 @@ def resetResultFiles(submissionsFile, commentsFile):
         os.remove(commentsFile)
 
 def loadConfig(path):
-    logging.info("Loadin configuration from: " + path)
+    logging.info("Loading configuration from: " + path)
     with open(path) as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
     return config
@@ -95,7 +103,7 @@ def loadCreds(path):
     return creds
 
 def main():
-    config = loadConfig("./config.yml")
+    config = loadConfig("../config.yml")
     creds = loadCreds(config["credsPath"])
 
     resetResultFiles(config["submissionsFile"], config["commentsFile"])
