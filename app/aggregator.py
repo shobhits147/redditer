@@ -18,7 +18,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 '''
 The job of Aggregator is to:
 1. Stream posts and comments at 10 seconds interval
-2. Filter out data that doesn't match the base and provided filters
+2. Filter out data that doesn't match the base filters and custom filters
 3. Add the given response to matched posts and comments
 4. Dump data about the filtered posts and comments to `submissionsFile` and `commentsFile`
 '''

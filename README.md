@@ -49,8 +49,8 @@ venv/bin/pip install -r requirements.txt
 
 6. Start redditer:
     ```shell
-    cd redditer/
-    venv/bin/python aggregator.py
+    cd redditer/app/
+    ../venv/bin/python aggregator.py
     ```
     
 ## How it Works
@@ -72,7 +72,7 @@ venv/bin/pip install -r requirements.txt
     
 6. The job of Aggregator is to:
     1. Stream posts and comments at 10 seconds interval
-    2. Filter out data that doesn't match the base and provided filters
+    2. Filter out data that doesn't match the base filters and custom filters
     3. Add the given response to matched posts and comments
     4. Dump data about the filtered posts and comments to `submissionsFile` and `commentsFile`
 
@@ -118,7 +118,7 @@ Since we are dumping a CSV, this can be easily loaded into analytics systems and
 
 ## How to add custom filter logics
 
-1. To add a new filter to the collected submissions and comments, you need modify `redditer/filters.py`
+1. To add a new filter to the collected submissions and comments, you need modify `redditer/app/filters.py`
 
 2. Define your own class of filters, e.g.:
     ```python
